@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 df = pd.read_excel("backtracking.xlsx")
 df.columns = df.columns.str.strip()
 
@@ -37,7 +38,7 @@ def knapsack_backtracking(i, w, v, sol):
 
     if i == n:
         if v > max_value:
-            max_value = v
+            max_value = v    
             best_solution = sol.copy()
         return
 
@@ -67,7 +68,40 @@ for i in range(n):
         selected_items.append(items[i])
         total_weight += weights[i]
 
-print("\n=== HASIL BACKTRACKING 0/1 KNAPSACK ===")
+def knapsack_dp(weights, values, capacity):
+    n = len(weights)
+
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+
+
+    for i in range(1, n + 1):
+        for w in range(capacity + 1):
+            if weights[i - 1] <= w:
+                dp[i][w] = max(
+                    dp[i - 1][w],  # tidak ambil item
+                    dp[i - 1][w - weights[i - 1]] + values[i - 1]  # ambil item
+                )
+            else:
+                dp[i][w] = dp[i - 1][w]
+
+    selected = []
+    w = capacity
+    for i in range(n, 0, -1):
+        if dp[i][w] != dp[i - 1][w]:
+            selected.append(items[i - 1])
+            w -= weights[i - 1]
+
+    selected.reverse()
+    return dp[n][capacity], selected
+
+dp_max_value, dp_selected_items = knapsack_dp(weights, values, CAPACITY)
+
+print("\nHASIL DYNAMIC PROGRAMMING 0/1 KNAPSACK")
+print("Nilai maksimum  :", dp_max_value)
+print("Item terpilih   :", dp_selected_items)
+print("Kapasitas       :", CAPACITY)
+
+print("\n HASIL BACKTRACKING 0/1 KNAPSACK ")
 print("Jumlah item     :", n)
 print("Nilai maksimum  :", max_value)
 print("Item terpilih   :", selected_items)
